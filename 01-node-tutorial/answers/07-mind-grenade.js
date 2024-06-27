@@ -4,5 +4,5 @@ const b = 10;
 function addValues() {
     console.log(`the sum is ${a+b}`)
 }
-addValues()
+module.exports = addValues;
 
