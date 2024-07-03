@@ -21,21 +21,24 @@ const getBody = (req, callback) => {
 };
 
 // here, you could declare one or more variables to store what comes back from the form.
-let item = "Enter something below.";
+let randomNumber = Math.floor(Math.random() * 100) + 1;
+let guessFeedback = "Enter your guess below.";
+let previousGuesses = [];
 
 // here, you can change the form below to modify the input fields and what is displayed.
 // This is just ordinary html with string interpolation.
 const form = () => {
   return `
   <body>
-  <p>${item}</p>
-  <form method="POST">
-  <input name="item"></input>
-  <button type="submit">Submit</button>
-  </form>
+    <p>${guessFeedback}</p>
+    <form method="POST">
+      <input name="guess" type="number" min="1" max="100" required></input>
+      <button type="submit">Submit</button>
+    </form>
+    <p>Previous guesses: ${previousGuesses.join(", ")}</p>
   </body>
   `;
-};
+}
 
 const server = http.createServer((req, res) => {
   console.log("req.method is ", req.method);
@@ -43,13 +46,23 @@ const server = http.createServer((req, res) => {
   if (req.method === "POST") {
     getBody(req, (body) => {
       console.log("The body of the post is ", body);
-      // here, you can add your own logic
-      if (body["item"]) {
-        item = body["item"];
+      const guess = parseInt(body["guess"], 10);
+
+      // Add the guess to the previous guesses list
+      previousGuesses.push(guess);
+
+      // Check the user's guess
+      if (guess < randomNumber) {
+        guessFeedback = "Your guess is too low. Try again!";
+      } else if (guess > randomNumber) {
+        guessFeedback = "Your guess is too high. Try again!";
       } else {
-        item = "Nothing was entered.";
+        guessFeedback = `Congratulations! You guessed the number ${randomNumber} correctly.`;
+        // Reset the game
+        randomNumber = Math.floor(Math.random() * 100) + 1;
+        previousGuesses = [];
       }
-      // Your code changes would end here
+
       res.writeHead(303, {
         Location: "/",
       });
@@ -59,6 +72,7 @@ const server = http.createServer((req, res) => {
     res.end(form());
   }
 });
+
 
 server.listen(3000);
 console.log("The server is listening on port 3000.");
