@@ -59,7 +59,7 @@ app.put('/api/people/:id', (req, res) => {
     }
     return person
   })
-  res.status(200).json({ success: true, data: newPeople })
+  res.status(200).json({ success: true, data: person })
 })
 
 app.delete('/api/people/:id', (req, res) => {
